@@ -1,18 +1,17 @@
-'use strict';
+const config = {
+  mongodb: {
+    connectionString: 'localhost/degg_db',
+    testConnectionString: 'localhost/test_degg_db'
+  },
 
-module.exports = {
+  ratelimit: {
+    max: 1000,
+    duration: 60000
+  },
 
-    mongodb: {
-        connectionString: 'localhost/degg_db',
-        testConnectionString: 'localhost/test_degg_db'
-    },
+  secret: process.env.secretJwt,
 
-    ratelimit: {
-        max: 1000,
-        duration: 60000 
-    },
-
-    secret: process.env.secretJwt,
-
-    REDISURL: process.env.REDISURL,
+  REDISURL: process.env.REDISURL
 };
+
+export default config;
