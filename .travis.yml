@@ -15,9 +15,7 @@ before_install:
     - sudo apt-get install -y -qq yarn
 
 before_script:
-  - npm install -g grunt
-
-script: grunt
+  - npm install -g grunt && grunt
 
 cache:
     directories:
