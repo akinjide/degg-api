@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 import koa from 'koa';
-import r from 'koa-route';
+import Router from 'koa-better-router';
 import responseTime from 'koa-response-time';
 import compress from 'koa-compress';
 import ratelimit from 'koa-ratelimit';
@@ -9,13 +9,26 @@ import redis from 'redis';
 import Klogger from 'koa-logger';
 import convert from 'koa-convert';
 import cors from 'kcors';
-import wrap from 'co-monk';
-import monk from 'monk';
+import morgan from 'koa-morgan';
+import FileStreamRotator from 'file-stream-rotator';
 import loggerInit from './config/logger';
 import config from './config/config';
 import fs from 'fs';
 
+import routes from './app/routes';
+
 const app = new koa();
+const api = Router({ prefix: '/v1' });
+
+const logDirectory = __dirname + '/logs';
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
+
+const accessLogStream = FileStreamRotator.getStream({
+  date_format: 'YYYYMMDD',
+  filename: logDirectory + '/access-%DATE%.log',
+  frequency: 'weekly',
+  verbose: false
+});
 
 /**
   * koa appication name
@@ -30,31 +43,27 @@ const logger = app.env
 global.logger = logger;
 logger.info(`Application starting....`);
 logger.debug(`Overriding \'Express\' logger`);
-
-/**
-  * connect to mongodb
-  * @private
-  */
-const db = monk(config.mongodb.connectionString);
-db.then(() => {
-  logger.info(`Connected correctly to DB server :).. Have a [̲̅$̲̅(̲̅5̲̅)̲̅$̲̅] bill!`);
-});
+logger.info(`Connected correctly to server :).. Have a [̲̅$̲̅(̲̅5̲̅)̲̅$̲̅] bill!`);
 
 
 /**
  * Middlewares.
  * logger -> `Klogger`
+ * logger -> `morgan`
  * x-response-time -> `responseTime`
  * compression -> `compress`
- * headers -> `helmet`
- * cross origin resource -> `cors`
  * rate limiting -> `ratelimit`
- * routing -> `r`
+ * routing -> `api`
  * @private
  */
 if ('test' != app.env) app.use(convert(Klogger()));
+app.use(morgan('combined', { stream: accessLogStream }));
 app.use(convert(responseTime()));
 app.use(convert(compress()));
+app.use(convert(function *poweredBy(next) {
+  this.set('x-powered-by', 'koa');
+  yield* next
+}));
 app.use(helmet());
 app.use(convert(cors({
   origin: '*',
@@ -68,15 +77,23 @@ app.use(convert(ratelimit({
   duration: config.ratelimit.duration
 })));
 
-// response middleware
+// error handlers
 
-app.use(r.get('/', function *() {
-  this.status = 200;
-  this.body = { message: `Hello degg-api ¯\_(ツ)_/¯`, status: this.status };
+app.use(convert(function *(next) {
+  try {
+    yield next;
+  } catch (err) {
+    this.status = err.status || 500;
+    this.response.body = 'oh no! something broke!'
+    logger.error(err.stack)
+  }
 }));
 
+// response middleware
 
-// routes(app, `${__dirname}/api`);
+// add `router`'s routes to api router
+api.extend(routes)
+app.use(api.middleware());
 
 
 /**
