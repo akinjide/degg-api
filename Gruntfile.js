@@ -10,6 +10,7 @@ module.exports = function(grunt) {
         expand: true,
         src: ['app/**/*.js', './config/*.js', './index.js', './bin/www'],
         dest: './build'
+        // ext: '.js'
       }
     },
     eslint: {
@@ -54,7 +55,7 @@ module.exports = function(grunt) {
     watch: {
       scripts: {
         files: ['<%= babel.build.src %>'],
-        tasks: ['clean', 'build']
+        tasks: ['babel']
       }
     }
   });
@@ -69,8 +70,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-concurrent');
 
   // Grunt Tasks.
-  grunt.registerTask('default', ['concurrent:dev']);
-  grunt.registerTask('serve-dev', ['clean', 'babel', 'nodemon']);
-  grunt.registerTask('build', ['babel']);
+  grunt.registerTask('default', ['clean', 'babel', 'nodemon']);
+  grunt.registerTask('serve-dev', ['clean', 'babel', 'concurrent:dev']);
+  grunt.registerTask('build', ['babel', 'eslint']);
   grunt.registerTask('lint', ['eslint']);
 };

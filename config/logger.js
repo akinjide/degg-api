@@ -1,4 +1,5 @@
 import winston from 'winston';
+import 'loggly-winston-bulk'
 
 winston.emitErrs = true;
 

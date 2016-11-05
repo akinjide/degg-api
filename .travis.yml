@@ -1,14 +1,12 @@
 language: node_js
 node_js:
+    - '7'
     - '6'
-    - '5'
     - '4'
-    - '0.11'
-    - '0.10'
 
 before_install:
     # Repo for newer Node.js versions
-    - curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    # - curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
     
     # Repo for Yarn
     - sudo apt-key adv --keyserver pgp.mit.edu --recv D101F7899D41F3C3
@@ -18,3 +16,6 @@ before_install:
 cache:
     directories:
     - $HOME/.yarn-cache
+
+services:
+    - mongodb
