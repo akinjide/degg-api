@@ -70,7 +70,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-concurrent');
 
   // Grunt Tasks.
-  grunt.registerTask('default', ['clean', 'babel', 'nodemon']);
+  grunt.registerTask('default', ['clean', 'babel']);
   grunt.registerTask('serve-dev', ['clean', 'babel', 'concurrent:dev']);
   grunt.registerTask('build', ['babel', 'eslint']);
   grunt.registerTask('lint', ['eslint']);
