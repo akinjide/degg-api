@@ -14,6 +14,9 @@ before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -y -qq yarn
 
+env:
+  - NODE_ENV=build
+
 before_script:
   - npm install -g grunt && grunt
 

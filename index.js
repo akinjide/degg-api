@@ -56,7 +56,7 @@ logger.info(`Connected correctly to server :).. Have a [̲̅$̲̅(̲̅5̲̅)̲̅
  * routing -> `api`
  * @private
  */
-if ('test' != app.env) app.use(convert(Klogger()));
+if ('test' !== app.env) app.use(convert(Klogger()));
 app.use(morgan('combined', { stream: accessLogStream }));
 app.use(convert(responseTime()));
 app.use(convert(compress()));
@@ -71,11 +71,14 @@ app.use(convert(cors({
   allowHeaders: 'Authorization, Origin, Content-Type, Accept',
   credentials: true
 })));
-app.use(convert(ratelimit({
-  db: redis.createClient(),
-  max: config.ratelimit.max,
-  duration: config.ratelimit.duration
-})));
+
+if ('build' !== app.env) {
+  app.use(convert(ratelimit({
+    db: redis.createClient(),
+    max: config.ratelimit.max,
+    duration: config.ratelimit.duration
+  })));
+}
 
 // error handlers
 
