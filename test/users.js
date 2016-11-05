@@ -54,7 +54,7 @@ describe('User', () => {
 				.expect(200)
 				.end((err, res) => {
 					res.body.users.length.should.equal(1);
-					Object.keys(res.body.users[0]).should.eql(['_id', 'name', 'city']);
+					res.body.users[0].name.should.eql(seed.name);
 					done();
 				});
 		});
