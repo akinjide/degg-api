@@ -4,6 +4,7 @@ test:
 		--reporter dot \
 		--ui bdd \
 		--bail \
+		--growl \
 		test/*.js
 
 .PHONY: test
