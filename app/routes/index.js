@@ -1,27 +1,26 @@
 import 'babel-polyfill';
 import Router from 'koa-better-router';
+
 import userRoutes from './users';
+import authRoutes from './auth';
+import statRoutes from './stats';
+
+import HTTPStatus from '../utils/http-status';
+import * as Handler from '../utils/handlers';
 
 const router = Router().loadMethods();
 
-router.get('/', (ctx, next) => {
-  ctx.status = 200;
-  ctx.body = { 
-    current_url: `https://api.degg.com${ctx.route.path}`,
-    message: `degg-api ¯\\_(ツ)_/¯`, 
-    status: ctx.status 
-  };
-
-  return next();
-})
-
-// can use generator middlewares
-router.get('/foobar', function * (next) {
-  console.log(this.cookies);
-  this.body = `Foo Bar Baz! ${this.route.prefix}`
-  yield next
+router.get('/', function *() {
+  this.status = HTTPStatus.OK;
+  this.body = yield* Handler.success(this.route.path, `degg-api ¯\\_(ツ)_/¯`, this.status);
 });
 
 router.extend(userRoutes);
 
-export default router;
+/**
+ * Expose `router`
+ *
+ * @type {Router} `this` instance for chaining
+ * @api private
+ */
+export { router as default, authRoutes };

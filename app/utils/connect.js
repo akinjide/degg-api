@@ -1,21 +1,22 @@
 import monk from 'monk';
-import config from '../../config/config';
+import configurator from '../../config/config';
+
+const environment = process.env.NODE_ENV || 'development'
+const config = configurator(environment);
 
 /**
-  * connect to mongodb
-  * @public
-  */
-const db = monk(config.mongodb.connectionString);
-db
-  .then((db) => {
-    logger.info(`.`);
-  })
-  .catch((err) => {
-    logger.warn(err);
-  });
+ * connect to mongodb
+ *
+ * @param {String} mongo uri
+ * @param {Object} opts
+ * @return {Promise} resolve when the connection is opened
+ * @public
+ */
+const db = (uri = `${config.mongodb.hostname}/${config.mongodb.db}`, opts = {}) => monk(uri, opts);
 
 /**
  * Expose `db()`.
+ *
  * @return {Connection} db
  * @public
  */
