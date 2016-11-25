@@ -6,19 +6,16 @@ module.exports = function(grunt) {
         sourceMap: true,
         presets: ['es2015']
       },
-      build: {
+      transpile: {
         expand: true,
-        src: ['app/**/*.js', './config/*.js', './index.js', './bin/www'],
+        src: ['app/**/*.js', './config/**/*.js', './index.js', './bin/www'],
         dest: './build'
-        // ext: '.js'
       }
     },
     eslint: {
       options: {
         format: 'node_modules/eslint-json',
         outputFile: `${__dirname}/logs/eslint/${'<%= pkg.name %>'}-checkstyle.json`,
-        // configFile: 'config/eslint.json',
-        // rulePaths: ['config/rules']
       },
       build: ['**/*.js', 'bin/www', '!node_modules/**']
     },
@@ -32,7 +29,7 @@ module.exports = function(grunt) {
             });
           },
           env: {
-            PORT: '1334'
+            PORT: process.env.PORT
           },
           cwd: __dirname,
           ignore: ['node_modules/**'],
@@ -54,7 +51,7 @@ module.exports = function(grunt) {
     },
     watch: {
       scripts: {
-        files: ['<%= babel.build.src %>'],
+        files: ['<%= babel.transpile.src %>'],
         tasks: ['babel']
       }
     }
@@ -70,7 +67,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-concurrent');
 
   // Grunt Tasks.
-  grunt.registerTask('default', ['clean', 'babel']);
+  grunt.registerTask('default', ['clean', 'babel', 'nodemon']);
   grunt.registerTask('serve-dev', ['clean', 'babel', 'concurrent:dev']);
   grunt.registerTask('build', ['babel', 'eslint']);
   grunt.registerTask('lint', ['eslint']);

@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import http from 'http';
-import app from '../index';
 import debugModule from 'debug';
+
+import app from '../index';
 
 const debug = debugModule('degg-api:server');
 
@@ -44,11 +45,11 @@ const onError = (error) => {
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
-      console.error(`${bind} requires elevated privileges`);
+      logger.error(`${bind} requires elevated privileges`);
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(`${bind} is already in use`);
+      logger.error(`${bind} is already in use`);
       process.exit(1);
       break;
     default:
@@ -82,4 +83,6 @@ const server = http.createServer(app.callback());
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-logger.info(`${app.name} Application started on * ${port}`);
+logger.info(`${app.name} Application started on * ${port}
+      __dirname = ${ __dirname}
+      process.cwd = ${process.cwd()}`);
