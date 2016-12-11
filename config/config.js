@@ -15,7 +15,7 @@ const defaults = {
 
   secret: 'degg-secret' || process.env.secretJwt,
 
-  REDISURL: process.env.REDISURL
+  REDISURL: process.env.REDIS_URL
 };
 
 const configurator = environment => {

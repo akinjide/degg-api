@@ -1,7 +1,14 @@
+import _ from 'lodash';
 import winston from 'winston';
-import 'loggly-winston-bulk'
+import 'winston-loggly-bulk';
+
+import configurator from '../config/config';
 
 winston.emitErrs = true;
+
+const { inputToken, subdomain } = configurator(process.env.NODE_ENV);
+const logglyCredentials = { inputToken, subdomain };
+
 
 /**
  * winston configuration object.
@@ -31,7 +38,7 @@ const getWinstonConfig = (type, confOpts = {}, opts = {}) => {
     opts.maxsize = 5242880;
   }
 
-  return new winston.transports[type](Object.assign({}, defaultConfig(confOpts), opts));
+  return new winston.transports[type](_.assign({}, defaultConfig(confOpts), opts));
 }
 
 
@@ -42,7 +49,11 @@ const logger = (env) => {
     ret = new winston.Logger({
       transports: [
         getWinstonConfig('Console', { level: 'error' }),
-        getWinstonConfig('File', { level: 'info', json: true }, { maxFiles: 100 })
+        getWinstonConfig('File', { level: 'info', json: true }, { maxFiles: 100 }),
+        getWinstonConfig('Loggly', { level: 'info', json: true },
+          _.assign({}, logglyCredentials, {
+          tags: ["degg-production"]
+        }))
       ],
       exitOnError: false
     });
@@ -50,7 +61,11 @@ const logger = (env) => {
     ret = new winston.Logger({
       transports: [
         getWinstonConfig('Console'),
-        getWinstonConfig('File', { level: 'info', json: true }, { maxFiles: 5, colorize: false })
+        getWinstonConfig('File', { level: 'info', json: true }, { maxFiles: 5, colorize: false }),
+        getWinstonConfig('Loggly', { level: 'info', json: true },
+          _.assign({}, logglyCredentials, {
+          tags: ["degg-development"]
+        }))
       ],
       exitOnError: false
     });
