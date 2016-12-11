@@ -24,7 +24,9 @@ import configurator from './config/config';
 import loggerInit from './config/logger';
 import {
   default as routes,
-  authRoutes
+  users,
+  auths,
+  stats
 } from './app/routes';
 import * as Handler from './app/utils/handlers';
 import {
@@ -35,7 +37,8 @@ import {
 
 const app = new Koa();
 
-const api = Router({ prefix: '/v1' });
+// routes prefixes
+const api = Router({ prefix: 'v1' });
 const base = Router();
 
 const environment = process.env.NODE_ENV || app.env || 'development';
@@ -89,7 +92,7 @@ app.use(convert(function *(next) {
     if (HTTPStatus.UNAUTHORIZED == this.status) {
       this.set('WWW-Authenticate', 'Basic, Bearer');
       this.set('Status', `${HTTPStatus.UNAUTHORIZED} Unauthorized`);
-      this.response.message = 'Protected resource, use Authorization header to get access\n';
+      this.message = 'Protected resource, use Authorization header to get access.';
     }
 
     const message = (err.message) ? err.message : `oh no! something broke!`;
@@ -159,6 +162,7 @@ app.use(convert(jwt({
     issuer:   'https://api.degg.com',
     subject: 'degg_token',
     debug: true,
+    passthrough: true,
     getToken: function fromHeaderOrQuerystring() {
       const queryToken = this.query.access_token;
 
@@ -173,7 +177,7 @@ app.use(convert(jwt({
             return credentials;
           }
         } else {
-          this.throw(401, 'Bad Authorization header format. Format is "Authorization: Bearer <token>"\n');
+          this.throw(HTTPStatus.UNAUTHORIZED, 'Bad Authorization header format. Format is "Authorization: Bearer <token>"\n');
         }
       } else if (this.query && queryToken) {
         const path = _.split(this.url, '?');
@@ -186,15 +190,18 @@ app.use(convert(jwt({
     }
   })
   .unless({
-    path: ['/', '/login/authenticate']
+    path: ['/', '/v1/users', '/login/authenticate'],
   }))
 );
 
 // add `router`'s routes to api router
-api.extend(routes);
+api
+  .extend(routes)
+  .extend(users)
+  .extend(stats);
 app.use(api.middleware());
 
-base.extend(authRoutes);
+base.extend(auths);
 app.use(base.middleware());
 
 
