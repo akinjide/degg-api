@@ -22,7 +22,7 @@ const users = wrap(db.get('users'));
 export function *create() {
   try {
     const body = yield parse(this);
-    const SCHEMA = ['name', 'city', 'password', 'username']
+    const SCHEMA = ['name', 'city', 'password', 'username'];
     const error = verify.checkRequestBody(body, SCHEMA);
 
     if (Object.keys(error).length) {
@@ -31,6 +31,7 @@ export function *create() {
     }
 
     const parsedBody = _.pick(body, _.concat(SCHEMA, 'salt'));
+    // yield RequestVerifier.checkUser(parsedBody);
 
     parsedBody.added_at = moment()._d;
     [ parsedBody.salt, parsedBody.password ] = yield Hash.hashPassword(body.password);
@@ -70,7 +71,7 @@ export function *readOne(id) {
     const response = yield users.findOne(id, queryFields );
 
     this.status = HTTPStatus.OK;
-    this.body = _.merge(yield* handler.success(this.route.path, this.message, this.status), { user: response });
+    this.body = _.merge(yield* Handler.success(this.route.path, this.message, this.status), { user: response });
   } catch (e) {
     this.status = e.status || HTTPStatus.INTERNAL_SERVER_ERROR;
     logger.error(e);
@@ -80,13 +81,19 @@ export function *readOne(id) {
 
 
 export function *updateOne(id) {
-  const body = yield parse(this);
+  try {
+    const body = yield parse(this);
 
-  body.updated_at = moment();
-  this.status = HTTPStatus.NO_CONTENT;
-  yield users.update(id, body);
-  this.set('location', `/user/${id}`);
-  this.body = HTTPCode[204];
+    body.updated_at = moment();
+    this.status = HTTPStatus.NO_CONTENT;
+    yield users.update(id, body);
+    this.set('location', `/user/${id}`);
+    this.body = HTTPCode[204];
+  } catch(e) {
+    this.status = e.status || HTTPStatus.INTERNAL_SERVER_ERROR;
+    logger.error(e);
+    this.body = yield* Handler.error(this.route.path, this.message, e, this.status);
+  }
 }
 
 
