@@ -150,7 +150,7 @@ app.use(convert(function *cors(next) {
   }
 }));
 
-if ('build' !== app.env) {
+if ('test' !== app.env) {
   app.use(convert(ratelimit({
     db: redis.createClient(),
     max: config.ratelimit.max,
