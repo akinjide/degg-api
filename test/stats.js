@@ -25,7 +25,7 @@ describe('Stats', () => {
         });
     });
 
-    it('should respond with server logs', done => {
+    it.skip('should respond with server logs', done => {
       _request
         .get('/v1/stats/logs')
         .expect(200)
