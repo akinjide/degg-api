@@ -1,6 +1,7 @@
 import 'babel-polyfill';
 import Router from 'koa-better-router';
 import { stats, logs } from '../../controllers/stats';
+import { hasAuthorization } from '../../middlewares/authorization';
 
 const router = Router().loadMethods();
 
@@ -18,7 +19,7 @@ const router = Router().loadMethods();
  *
  * @api private
  */
-router.get('/stats', stats);
-router.get('/stats/logs', logs);
+router.get('/stats', hasAuthorization(['admin', 'user']), stats);
+router.get('/stats/logs', hasAuthorization(['admin', 'user']), logs);
 
 export default router;
