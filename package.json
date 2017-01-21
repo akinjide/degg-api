@@ -9,12 +9,10 @@
     "npm": "2.14.12"
   },
   "scripts": {
-    "start": "node ./bin/www",
-    "dev": "build/bin/www",
-    "test": "./node_modules/mocha/bin/mocha test/*.js -u bdd -R dot -b --require should",
+    "start": "node build/bin/www",
+    "test": "make test",
     "test:coverage": "rimraf coverage/ && istanbul cover _mocha test/root.js \"test/root.js\""
   },
-  "_unused_koaverions": "^1.2.4",
   "repository": {
     "url": "git@github.com:akinjide/degg-api.git",
     "type": "git"
