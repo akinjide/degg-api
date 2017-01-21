@@ -1,7 +1,5 @@
 'use strict';
 
-process.env.NODE_ENV = 'test'
-
 const co = require('co');
 const monk = require('monk');
 const wrap = require('co-monk');
@@ -33,10 +31,11 @@ describe('User', () => {
 			_request
 				.post('/v1/users')
         .set('Content-Type', 'application/json')
+        .set('Authorization', `Bearer ${process.env.token}`)
 				.send(seed)
         .expect('Content-Type', /json/)
-				.expect('location', /^\/user\/[0-9a-fA-F]{24}$/)
 				.expect(201)
+				.expect('location', /^\/user\/[0-9a-fA-F]{24}$/)
 				.end((err, res) => {
 					res.body.current_url.should.equal('https://api.degg.com/v1/users');
 					done();
@@ -49,9 +48,10 @@ describe('User', () => {
 			_request
 				.post('/v1/users')
         .set('Content-Type', 'application/json')
+        .set('Authorization', `Bearer ${process.env.token}`)
 				.send(seed)
-				.expect(403)
         .expect('Content-Type', /json/)
+				.expect(403)
 				.end((err, res) => {
 					res.body.error.type.should.equal('Forbidden');
 					res.body.error.message['.name'].should.equal('is required');
@@ -62,7 +62,7 @@ describe('User', () => {
 
 
 	context('GET /users', () => {
-		before((done) => {
+		before(done => {
 	    const newseed = _.assign({}, seed);
 	    newseed.name = 'Degg';
 
@@ -73,13 +73,15 @@ describe('User', () => {
 
 		after(done => {
 	    helpers.removeAll(done);
+	    seed.name = 'Degg';
 		});
 
 		it('should retrieve all users', done => {
 			_request
 				.get('/v1/users')
-				.expect(200)
         .expect('Content-Type', /json/)
+        .set('Authorization', `Bearer ${process.env.token}`)
+				.expect(200)
 				.end((err, res) => {
 					res.body.users.length.should.equal(1);
 					res.body.users[0].name.should.eql('Degg');
@@ -87,65 +89,99 @@ describe('User', () => {
 				});
 		});
 
-		it.skip('should retrieve all users with username, city fields', done => {
+		it('should retrieve all users with specified fields', done => {
 			_request
-				.get('/v1/users?fields=name,username,password,salt')
-				.expect(200)
+				.get('/v1/users?fields=city,username')
         .expect('Content-Type', /json/)
+        .set('Authorization', `Bearer ${process.env.token}`)
+				.expect(200)
 				.end((err, res) => {
-					res.body.users.length.should.equal(1);
-					res.body.users[0].name.should.eql(seed.name);
+					res.body.users[0].username.should.eql(seed.username);
+					res.body.users[0].city.should.eql(seed.city);
 					done();
 				});
 		});
 
-		it('should get user', done => {
-			co(function *() {
+		it('should get user by Id', done => {
+			co(function *(done) {
+        seed.name = 'Degg';
 				const user = yield _users.insert(seed);
 				const url = '/v1/users/' + user._id;
-
-				_request
-					.get(url)
-					.set('Accept', 'application/json')
-					.expect('Content-Type', /json/)
-					.expect(/Degg/)
-					.expect(200)
-					.end((err, res) => {
-						res.body.user.name.should.eql(seed.name);
-						res.body.user.username.should.eql(seed.dg);
-						done();
-					})
-			}).then(done);
+        return url;
+			}).then(url => {
+        _request
+          .get(url)
+          .expect('Content-Type', /json/)
+          .set('Authorization', `Bearer ${process.env.token}`)
+          .expect(200)
+          .expect(/Degg/)
+          .end((err, res) => {
+            res.body.user.name.should.eql(seed.name);
+            res.body.user.email.should.eql(seed.email);
+            done();
+          })
+      });
 		});
+
+    it('should get user by Id with specified fields', done => {
+      co(function *(done) {
+        const user = yield _users.find({ name: seed.name });
+        const url = '/v1/users/' + user[0]._id + '?fields=name,city';
+        return url;
+      }).then(url => {
+        _request
+          .get(url)
+          .expect('Content-Type', /json/)
+          .set('Authorization', `Bearer ${process.env.token}`)
+          .expect(200)
+          .expect(/Degg/)
+          .end((err, res) => {
+            res.body.user.name.should.eql(seed.name);
+            res.body.user.city.should.eql(seed.city);
+            done();
+          });
+      });
+    });
 	});
 
 
-	// context('PUT /users', () => {
-	// 	// seed = {
-	// 	// 	name: 'Degg',
-	// 	// 	city: 'Bandung, Indonesia',
-	// 	// 	added_at: moment()
-	// 	// };
+	context.skip('PUT /users', () => {
+		let url;
 
-	// 	before(done => {
-	// 		removeAll(done);
-	// 		done();
-	// 	});
+		before(done => {
+			_request
+				.post('/v1/users')
+        .set('Content-Type', 'application/json')
+				.send(seed)
+				.end((err, res) => {
+					url = res.header.location;
+					console.log(url, res.body)
+					done();
+				});
+		});
 
-	// 	it('should update existing user', done => {
-	// 		co.wrap(function *() {
-	// 			const user = yield _users.insert(seed);
-	// 			const url = '/v1/users/' + user._id;
+		after(done => {
+	    helpers.removeAll(done);
+		});
 
-	// 			_request
-	// 				.put(url)
-	// 				.send({ name: 'new Degg', city: 'New York, NY' })
-	// 				.expect('location', url)
-	// 				.expect(/new Degg/)
-	// 				.expect(204, done)
-	// 		})();
-	// 	});
-	// });
+		it('should update existing user', done => {
+			const id = _.split(url, '/')[2];
+			console.log(id, 'update')
+
+			_request
+				.put(`/v1/users/${id}`)
+        .set('Content-Type', 'application/json')
+				.send({ name: 'new Degg', city: 'New York, NY' })
+				.expect('Content-Type', /json/)
+				.expect(204)
+				// .expect('location', url)
+				// .expect(/new Degg/)
+				.end((err, res) => {
+					console.log(res.body, 'yeet');
+					done();
+				});
+		});
+	});
 
 
 	// context('DELETE /users', () => {

@@ -1,7 +1,5 @@
 'use strict';
 
-process.env.NODE_ENV = 'test'
-
 const co = require('co');
 const monk = require('monk');
 const wrap = require('co-monk');

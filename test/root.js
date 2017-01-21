@@ -1,19 +1,10 @@
 'use strict';
 
-process.env.NODE_ENV = 'test';
-
-const co = require('co');
-const monk = require('monk');
-const wrap = require('co-monk');
 const request = require('supertest');
 const assert = require('assert');
 
 const app = require('../build/index.js');
-const configurator = require('../build/config/config');
-
-const config = configurator.default(process.env.NODE_ENV);
 const _request = request.agent(app.default.listen());
-const db = monk(config.mongodb.testConnectionString);
 
 const helpers = require('./helpers/clean');
 const seed = require('./helpers/seed').seed;
@@ -22,7 +13,7 @@ const seed = require('./helpers/seed').seed;
 describe('Root', () => {
   before(done => {
     _request
-      .post('/v1/users')
+      .post('/v1/register')
       .send(seed)
       .end(done);
   });
@@ -32,7 +23,7 @@ describe('Root', () => {
   });
 
   context('# v1/', () => {
-    it.skip('should throw an error without TOKEN', done => {
+    it('should throw an error without TOKEN', done => {
       _request
         .get('/v1/')
         .expect(401)
@@ -55,13 +46,14 @@ describe('Root', () => {
         .expect('Content-Type', /json/)
         .end((err, res) => {
           process.env.token = res.body.access_token;
+
           assert.equal(res.body.token_type, 'bearer');
           assert.equal(res.body.current_url, 'https://api.degg.com/login/authenticate');
           done();
         });
     });
 
-    it.skip('should throw an error INVALID TOKEN', done => {
+    it('should throw an error INVALID TOKEN', done => {
       _request
         .get('/v1/')
         .expect('Content-Type', /json/)

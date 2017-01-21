@@ -1,8 +1,5 @@
 'use strict';
 
-process.env.NODE_ENV = 'test';
-
-const co = require('co');
 const request = require('supertest');
 const assert = require('assert');
 
@@ -17,6 +14,7 @@ describe('Stats', () => {
       _request
         .get('/v1/stats')
         .expect('Content-Type', /json/)
+        .set('Authorization', `Bearer ${process.env.token}`)
         .expect(200)
         .end((err, res) => {
           res.body.current_url.should.equal('https://api.degg.com/v1/stats');
@@ -25,9 +23,10 @@ describe('Stats', () => {
         });
     });
 
-    it.skip('should respond with server logs', done => {
+    it('should respond with server logs', done => {
       _request
         .get('/v1/stats/logs')
+        .set('Authorization', `Bearer ${process.env.token}`)
         .expect(200)
         .expect('Content-Type', /octet-stream/)
         .end(done);
