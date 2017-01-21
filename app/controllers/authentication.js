@@ -7,6 +7,7 @@ import _ from 'lodash';
 import dbConnect from '../utils/connect';
 import RequestVerifier from '../utils/request-verifier';
 import Hash from '../utils/hash';
+import roles from '../utils/roles';
 import supRoutes from '../utils/supported-routes';
 import * as Token from '../utils/token';
 import * as Handler from '../utils/handlers';
@@ -42,15 +43,16 @@ export function *bearer() {
         // Remove sensitive data before login
         user.salt = undefined;
         user.password = undefined;
+        user.role = roles[3];
 
         const access_token = yield Token.issueToken(user);
 
         this.status = HTTPStatus.OK;
-        this.set('X-OAuth-Scopes', 'users');
+        // this.set('X-OAuth-Scopes', 'users');
         this.body = _.merge(yield* Handler.success(this.route.path, this.message, this.status),
         {
           access_token: access_token,
-          scope: 'users',
+          // scope: 'users',
           token_type: 'bearer'
         });
       }

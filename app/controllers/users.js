@@ -52,8 +52,11 @@ export function *create() {
 
 export function *readAll() {
   try {
-    const queryFields = verify.checkRequestQuery(this.query.fields, ['id', 'name', 'city', 'username', 'added_at', 'updated_at']);
-    const response = yield users.find({}, queryFields );
+    const queryFields = this.query.fields
+      ? verify.checkRequestQuery(this.query.fields, ['id', 'name', 'city', 'username', 'added_at', 'updated_at'])
+      : verify.checkRequestQuery(this.queryFields, [], { 'password': 0, 'salt': 0 })
+
+    const response = yield users.find({}, queryFields);
 
     this.status = HTTPStatus.OK;
     this.body = _.merge(yield* Handler.success(this.route.path, this.message, this.status), { users: response });
@@ -67,8 +70,13 @@ export function *readAll() {
 
 export function *readOne(id) {
   try {
-    const queryFields = verify.checkRequestQuery(this.query.fields, ['id', 'name', 'city', 'added_at', 'updated_at']);
-    const response = yield users.findOne(id, queryFields );
+    // console.log(this.query.fields);
+
+    const queryFields = this.query.fields
+      ? verify.checkRequestQuery(this.query.fields, ['id', 'name', 'city', 'username', 'added_at', 'updated_at'])
+      : verify.checkRequestQuery(this.queryFields, [], { 'password': 0, 'salt': 0 })
+
+    const response = yield users.findOne(this.params.id, queryFields);
 
     this.status = HTTPStatus.OK;
     this.body = _.merge(yield* Handler.success(this.route.path, this.message, this.status), { user: response });
@@ -84,11 +92,13 @@ export function *updateOne(id) {
   try {
     const body = yield parse(this);
 
-    body.updated_at = moment();
+    console.log(id, 'from users update', body, this.params.id);
+    body.updated_at = moment()._d;
+    // yield users.update({ _id: this.params.id }, { $set: body });
+
     this.status = HTTPStatus.NO_CONTENT;
-    yield users.update(id, body);
-    this.set('location', `/user/${id}`);
-    this.body = HTTPCode[204];
+    // this.set('location', `/v1/user/${id}`);
+    this.body = yield* Handler.success(this.route.path, this.message, this.status);
   } catch(e) {
     this.status = e.status || HTTPStatus.INTERNAL_SERVER_ERROR;
     logger.error(e);
@@ -97,9 +107,19 @@ export function *updateOne(id) {
 }
 
 
+export function *updateMany() {
+
+}
+
+
 export function *removeOne(id) {
   this.status = HTTPStatus.NO_CONTENT;
   this.body = yield users.findOneAndDelete({ _id: id });
+}
+
+
+export function *removeMany() {
+
 }
 
 

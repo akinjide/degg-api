@@ -49,5 +49,11 @@ export function *stats() {
 
 export function *logs() {
   this.status = HTTPStatus.OK;
-  this.body = fs.createReadStream('server.log');
+  const isAvail = yield fsWrap.exists('server.log');
+
+  if (isAvail) {
+    this.body = fs.createReadStream('server.log');
+  } else {
+    this.body = yield* Handler.success(this.route.path, 'No log yet! :)', this.status);
+  }
 }
