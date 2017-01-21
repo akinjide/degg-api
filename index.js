@@ -16,7 +16,7 @@ import session from 'koa-session';
 import conditional from 'koa-conditional-get';
 import etag from 'koa-etag';
 import mount from 'koa-mount';
-import auth from 'koa-basic-auth';
+import bAuth from 'koa-basic-auth';
 import _ from 'lodash';
 import zlib from 'zlib';
 
@@ -25,7 +25,7 @@ import loggerInit from './config/logger';
 import {
   default as routes,
   users,
-  auths,
+  auth,
   stats
 } from './app/routes';
 import * as Handler from './app/utils/handlers';
@@ -78,7 +78,6 @@ logger.debug(`Overriding \'Express\' logger`);
 logger.info(`Connected correctly to server :).. Have a [̲̅$̲̅(̲̅5̲̅)̲̅$̲̅] bill!`);
 logger.info('NODE_ENV=' + environment);
 
-
 // error handler
 app.use(convert(function *(next) {
   try {
@@ -99,7 +98,7 @@ app.use(convert(function *(next) {
     const path = (this.route) ? this.route.path : this.url;
 
     this.body = yield* Handler.error(path, this.message, message, this.status);
-    logger.error(err.stack)
+    // logger.error(err.stack)
   }
 }));
 
@@ -117,7 +116,7 @@ app.use(convert(function *(next) {
  *
  * @private
  */
-if ('test' !== app.env) {
+if ('test' !== environment) {
   app.use(convert(Klogger()));
 }
 
@@ -150,19 +149,20 @@ app.use(convert(function *cors(next) {
   }
 }));
 
-if ('test' !== app.env) {
+if ('test' !== environment) {
   app.use(convert(ratelimit({
     db: redis.createClient(),
     max: config.ratelimit.max,
     duration: config.ratelimit.duration
   })));
 }
+
 app.use(convert(jwt({
     secret: config.secret,
-    issuer:   'https://api.degg.com',
+    issuer: 'https://api.degg.com',
     subject: 'degg_token',
-    debug: true,
-    passthrough: true,
+    debug: false,
+    passthrough: false,
     getToken: function fromHeaderOrQuerystring() {
       const queryToken = this.query.access_token;
 
@@ -190,7 +190,7 @@ app.use(convert(jwt({
     }
   })
   .unless({
-    path: ['/', '/v1/users', '/login/authenticate'],
+    path: ['/', '/v1/register', '/login/authenticate'],
   }))
 );
 
@@ -201,7 +201,7 @@ api
   .extend(stats);
 app.use(api.middleware());
 
-base.extend(auths);
+base.extend(auth);
 app.use(base.middleware());
 
 
