@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "node build/bin/www",
+    "dev": "build/bin/www",
     "test": "make test",
     "test:coverage": "rimraf coverage/ && istanbul cover _mocha test/root.js \"test/root.js\""
   },

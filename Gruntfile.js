@@ -17,7 +17,7 @@ module.exports = function(grunt) {
         format: 'node_modules/eslint-json',
         outputFile: `${__dirname}/logs/eslint/${'<%= pkg.name %>'}-checkstyle.json`,
       },
-      build: ['**/*.js', 'bin/www', '!node_modules/**']
+      build: ['**/*.js', 'bin/www', '!node_modules/**', '!build']
     },
     nodemon: {
       dev: {
