@@ -6,7 +6,7 @@ const wrap = require('co-monk');
 const request = require('supertest');
 const assert = require('assert');
 const moment = require('moment');
-const _  = require('lodash');
+const _ = require('lodash');
 
 const app = require('../build/index.js');
 const configurator = require('../build/config/config');
