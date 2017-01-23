@@ -9,33 +9,50 @@
     "npm": "2.14.12"
   },
   "scripts": {
-    "start": "node ./bin/www",
-    "dev": "./bin/www",
-    "test": "./node_modules/mocha/bin/mocha test/*.js -u bdd -R spec"
+    "start": "node build/bin/www",
+    "dev": "build/bin/www",
+    "test": "make test",
+    "test:coverage": "rimraf coverage/ && istanbul cover _mocha test/root.js \"test/root.js\""
   },
-  "_unused_koaverions": "^1.2.4",
   "repository": {
-    "url": "git@github.com:andela-abankole/degg-api.git",
+    "url": "git@github.com:akinjide/degg-api.git",
     "type": "git"
   },
   "author": "Akinjide Bankole <r@akinjide.me>",
   "license": "MIT",
   "dependencies": {
+    "bluebird": "^3.4.6",
+    "co": "^4.6.0",
+    "co-bcryptjs": "^0.2.0",
     "co-body": "^4.2.0",
+    "co-from-stream": "^0.0.0",
     "co-monk": "^1.0.0",
-    "kcors": "^1.3.1",
+    "file-stream-rotator": "^0.0.7",
+    "joi": "^9.2.0",
     "koa": "2",
-    "koa-compress": "^1.0.9",
+    "koa-basic-auth": "^1.1.2",
+    "koa-better-router": "^2.0.1",
+    "koa-compress": "^2.0.0",
+    "koa-conditional-get": "^1.0.3",
     "koa-convert": "^1.2.0",
+    "koa-etag": "3",
     "koa-helmet": "^2.0.0",
+    "koa-jwt": "^1.2.0",
     "koa-logger": "^1.3.0",
+    "koa-morgan": "^1.0.1",
+    "koa-mount": "^1.3.0",
+    "koa-multer": "^1.0.0",
+    "koa-passport": "^1.3.0",
     "koa-ratelimit": "^2.4.0",
     "koa-response-time": "^1.0.2",
-    "koa-route": "^2.4.2",
+    "koa-session": "^3.4.0",
     "lodash": "^4.16.4",
+    "moment": "^2.16.0",
     "monk": "^3.1.3",
     "redis": "^2.6.2",
-    "winston": "^2.2.0"
+    "thunkify": "^2.1.2",
+    "winston": "^2.2.0",
+    "winston-loggly-bulk": "^1.3.4"
   },
   "devDependencies": {
     "babel": "^6.5.2",
@@ -45,7 +62,6 @@
     "babel-plugin-transform-es2015-modules-umd": "^6.18.0",
     "babel-polyfill": "^6.16.0",
     "babel-preset-es2015": "^6.16.0",
-    "coveralls": "^2.11.14",
     "eslint": "^3.8.1",
     "eslint-json": "^2.0.0",
     "eslint-plugin-import": "^2.0.1",
@@ -59,6 +75,8 @@
     "grunt-nodemon": "^0.4.2",
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
+    "rimraf": "^2.5.4",
+    "should": "^11.1.1",
     "supertest": "^2.0.1"
   }
 }

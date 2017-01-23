@@ -1,44 +1,31 @@
 #!/usr/bin/env node
 
-// import http from 'http';
-// import app from '../index';
-// import debug as debugModule from 'debug';
-const http = require('http');
-const app = require('../build/index');
-const debugModule = require('debug');
+import http from 'http';
+import debugModule from 'debug';
+
+import app from '../index';
 
 const debug = debugModule('degg-api:server');
 
-const port = normalizePort(process.env.PORT || '3000');
-
-// create HTTP Server
-const server = http.createServer(app.default.callback());
-
-// app.set('server', server);
-
-server.listen(port);
-app.default.on('error', onError);
-app.default.on('listening', onListening);
-logger.info(app.default.name + ' Application started on * %s', port);
 
 /**
   * Normalize a port into a number, string, or false.
   * @private
   */
-function normalizePort(val) {
-    var port = parseInt(val, 10);
+const normalizePort = (val) => {
+  const port = parseInt(val, 10);
 
-    if (isNaN(port)) {
-        // named pipe
-        return val;
-    }
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
 
-    if (port >= 0) {
-        // port number
-        return port;
-    }
+  if (port >= 0) {
+    // port number
+    return port;
+  }
 
-    return false;
+  return false;
 }
 
 
@@ -46,28 +33,28 @@ function normalizePort(val) {
 	* Event listener for HTTP server "error" event.
 	* @private
 	*/
-function onError(error) {
-    if (error.syscall !== 'listen') {
-        throw error;
-    }
+const onError = (error) => {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
 
-    var bind = typeof port === 'string'
-        ? 'Pipe ' + port
-        : 'Port ' + port;
+  const bind = typeof port === 'string'
+    ? `Pipe ${port}`
+    : `Port ${port}`;
 
-    // handle specific listen errors with friendly messages
-    switch (error.code) {
-        case 'EACCES':
-            console.error(bind + ' requires elevated privileges');
-            process.exit(1);
-            break;
-        case 'EADDRINUSE':
-            console.error(bind + ' is already in use');
-            process.exit(1);
-            break;
-        default:
-            throw error;
-    }
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      logger.error(`${bind} requires elevated privileges`);
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      logger.error(`${bind} is already in use`);
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
 }
 
 
@@ -75,10 +62,27 @@ function onError(error) {
 	* Event listener for HTTP server "listening" event.
 	* @private
 	*/
-function onListening() {
-    var addr = server.address();
-    var bind = typeof addr === 'string'
-        ? 'pipe ' + addr
-        : 'port ' + addr.port;
-    debug('Listening on ' + bind);
+const onListening = () => {
+  const addr = server.address();
+  const bind = typeof addr === 'string'
+    ? `pipe ${addr}`
+    : `port ${addr.port}`;
+
+  debug(`Listening on ${bind}`);
 }
+
+
+const port = normalizePort(process.env.PORT || '3000');
+
+/**
+  * create HTTP Server
+  * @private
+  */
+const server = http.createServer(app.callback());
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+logger.info(`${app.name} Application started on * ${port}
+      __dirname = ${ __dirname}
+      process.cwd = ${process.cwd()}`);
