@@ -13,7 +13,7 @@ const configurator = require('../build/config/config');
 
 const config = configurator.default(process.env.NODE_ENV);
 const _request = request.agent(app.default.listen());
-const db = monk(config.mongodb.testConnectionString);
+const db = monk(config.mongodb.connectionString);
 
 const helpers = require('./helpers/clean');
 const seed = require('./helpers/seed').seed;

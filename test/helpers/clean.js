@@ -7,7 +7,7 @@ const wrap = require('co-monk');
 const configurator = require('../../build/config/config');
 
 const config = configurator.default(process.env.NODE_ENV);
-const db = monk(config.mongodb.testConnectionString);
+const db = monk(config.mongodb.connectionString);
 
 const _users = wrap(db.get('users'));
 
