@@ -44,7 +44,7 @@ const base = Router();
 const environment = process.env.NODE_ENV || app.env || 'development';
 const config = configurator(environment);
 
-app.keys = ['im a newer secret', 'i like turtle'];
+app.keys = [...config.secretKeys];
 
 const logDirectory = __dirname + '/logs';
 

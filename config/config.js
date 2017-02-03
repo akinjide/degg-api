@@ -9,11 +9,16 @@ const defaults = {
   root: path.normalize(__dirname + '/..'),
 
   ratelimit: {
-    max: 1000,
-    duration: 60000
+    max: process.env.redisMax || 1000,
+    duration: process.env.redisDuration || 60000
   },
 
-  secret: 'degg-secret' || process.env.secretJwt,
+  secret: process.env.secretJwt || 'degg-secret',
+
+  secretKeys: [
+    process.env.secretKey || 'i like turtle',
+    process.env.secretJwt || 'im a newer secret'
+  ],
 
   REDISURL: process.env.REDIS_URL
 };

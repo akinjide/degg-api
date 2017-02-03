@@ -3,7 +3,7 @@ const config = {
     hostname: 'localhost',
     db: 'test_degg_db',
     port: 27017,
-    testConnectionString: 'localhost/test_degg_db'
+    connectionString: 'localhost/test_degg_db'
   }
 };
 
