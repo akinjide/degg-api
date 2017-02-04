@@ -1,0 +1,56 @@
+#!/bin/bash
+
+appName='degg-api'
+
+# Check Tools
+echo "Checking Tools. . ."
+
+echo "NODE ver."
+echo `node --version`
+
+echo "REDIS ver."
+echo `redis-server --version`
+
+echo "GRUNT ver."
+echo `grunt --version`
+
+echo "MONGO ver."
+echo `mongo --version`
+
+echo "APP NAME"
+echo $appName
+
+echo "NODE ENVIRONMENT"
+echo $NODE_ENV
+
+
+if [[ $NODE_ENV == 'development' ]]; then
+  echo "In Development Mode"
+
+  # Install app dependencies
+  npm install -g migrate grunt
+  npm install
+
+  # Run Migration
+  migrate up
+
+  # Build and Run app source
+  grunt serve-dev
+else
+  echo "In Production Mode"
+
+  # Install app dependencies
+  npm install -g migrate grunt pm2
+  npm install
+
+  # Build app source
+  grunt
+
+  # Run Migration
+  migrate up
+
+  # Run app
+  pm2 start build/bin/www
+fi
+
+echo "@@@@@ DONE @@@@"
