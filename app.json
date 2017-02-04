@@ -1,0 +1,50 @@
+{
+  "name": "degg-api",
+  "description": "Degg api built with Koa.",
+  "keywords": [
+    "api",
+    "koa",
+    "entertainment",
+    "people"
+  ],
+  "repository": "https://github.com/akinjide/degg-api",
+  "scripts": {
+    "postdeploy": "npm install && npm install migrate -g && migrate up && grunt serve-dev",
+    "pr-predestroy": "migrate down"
+  },
+  "env": {
+    "connectionString": {
+      "required": true
+    },
+    "logglyInputToken": {
+      "required": true
+    },
+    "logglySubdomain": {
+      "required": true
+    },
+    "REDIS_URL": {
+      "required": true
+    },
+    "redisDuration": {
+      "required": true
+    },
+    "redisMax": {
+      "required": true
+    },
+    "secretJwt": {
+      "required": true
+    },
+    "secretKey": {
+      "required": true
+    }
+  },
+  "formation": {},
+  "addons": [
+    "heroku-redis"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
