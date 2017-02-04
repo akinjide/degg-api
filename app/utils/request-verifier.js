@@ -4,7 +4,7 @@ import Joi from 'joi';
 
 class RequestVerifier {
   constructor() {
-    this.errors = {};
+    this.errors;
     this.fields;
   }
 
@@ -17,6 +17,8 @@ class RequestVerifier {
    * @public
    */
   checkRequestBody(params, requiredFields) {
+    this.errors = {};
+
     _.each(requiredFields, (value, key) => {
       if (!params[requiredFields[key]]) {
         this.errors[`.${requiredFields[key]}`] = 'is required';
@@ -36,8 +38,6 @@ class RequestVerifier {
    * @public
    */
   checkRequestQuery(params, allowedQueryParams, exclude={}) {
-    // console.log(params);
-
     this.fields = {};
     params = _.replace(params, 'id', '_id');
 
@@ -61,50 +61,6 @@ class RequestVerifier {
     }
 
     return { fields: _.merge(this.fields, exclude) };
-  }
-
-  // Rules(type) {
-  //   return Object.create(this.schemes[type]);
-  // }
-
-  // schemes (type) {
-  //   create: {
-
-  //   },
-  //   update: {
-
-  //   },
-  //   username: {
-
-  //   },
-  //   password: {
-
-  //   },
-  //   email: {
-
-  //   }
-
-  // }
-
-  static *createScheme(params, allowedParams) {
-    const schema = Joi.object().keys({
-      username: Joi.string().alphanum().trim().min(6).max(30).required(),
-      name: Joi.string().min(3).max(80),
-      firstname: Joi.string().min(6).max(80),
-      lastname: Joi.string().min(6).max(80),
-      phone: Joi.string().min(8).max(16),
-      email: Joi.string().email().trim().required(),
-      city: Joi.string().min(3).max(80),
-      password: Joi.string().regex(/^[a-zA-Z0-9@#$()_]{3,30}$/).required()
-    }).with('username', 'email', 'password');
-
-    Joi.validate(params, schema, (err, value) => {
-      if (err) {
-        return { name: err.name, details: err.details };
-      }
-
-      return value;
-    });
   }
 }
 

@@ -39,7 +39,6 @@ const app = new Koa();
 
 // routes prefixes
 const api = Router({ prefix: 'v1' });
-const base = Router();
 
 const environment = process.env.NODE_ENV || app.env || 'development';
 const config = configurator(environment);
@@ -190,7 +189,7 @@ app.use(convert(jwt({
     }
   })
   .unless({
-    path: ['/', '/v1/register', '/login/authenticate'],
+    path: ['/', '/v1/register', '/v1/authenticate'],
   }))
 );
 
@@ -198,11 +197,9 @@ app.use(convert(jwt({
 api
   .extend(routes)
   .extend(users)
-  .extend(stats);
+  .extend(stats)
+  .extend(auth);
 app.use(api.middleware());
-
-base.extend(auth);
-app.use(base.middleware());
 
 
 /**
