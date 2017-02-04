@@ -150,7 +150,7 @@ app.use(convert(function *cors(next) {
 
 if ('test' !== environment) {
   app.use(convert(ratelimit({
-    db: redis.createClient(),
+    db: redis.createClient(config.REDISURL),
     max: config.ratelimit.max,
     duration: config.ratelimit.duration
   })));
