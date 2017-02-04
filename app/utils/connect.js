@@ -12,7 +12,7 @@ const config = configurator(environment);
  * @return {Promise} resolve when the connection is opened
  * @public
  */
-const db = (uri = `${config.mongodb.hostname}/${config.mongodb.db}`, opts = {}) => monk(uri, opts);
+const db = (uri = `${config.mongodb.connectionString}`, opts = {}) => monk(uri, opts);
 
 /**
  * Expose `db()`.
