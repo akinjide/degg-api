@@ -15,11 +15,11 @@ const router = Router().loadMethods();
 /**
  *
  * Route
- * /login/*
+ * /authenticate/*
  *
  * @api public
  */
-router.post('/login/authenticate', Auth.bearer);
+router.post('/authenticate', Auth.bearer);
 router.post('/login/access_token');
 
 /**

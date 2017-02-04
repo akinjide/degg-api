@@ -39,7 +39,7 @@ describe('Root', () => {
 
     it('should authenticate an existing user', done => {
       _request
-        .post('/login/authenticate')
+        .post('/v1/authenticate')
         .set('Content-Type', 'application/json')
         .send({ username: 'deggstar', password: 'password$'})
         .expect(200)
@@ -48,7 +48,7 @@ describe('Root', () => {
           process.env.token = res.body.access_token;
 
           assert.equal(res.body.token_type, 'bearer');
-          assert.equal(res.body.current_url, 'https://api.degg.com/login/authenticate');
+          assert.equal(res.body.current_url, 'https://api.degg.com/v1/authenticate');
           done();
         });
     });
